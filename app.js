@@ -2,7 +2,7 @@
 //  MAISON ANARA — connexion Supabase (storefront + analytics)
 //  Clé "publishable" : publique par nature, protégée par la sécurité RLS.
 // =====================================================================
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const { createClient } = window.supabase;   // librairie hébergée en local (vendor/supabase.js)
 
 const SUPABASE_URL = 'https://zhuukwcnzoueyoegmegi.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_9DYHswwUBkzXVEitvdKzBQ_fHHPJXuI';

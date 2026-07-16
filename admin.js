@@ -1,7 +1,7 @@
 // =====================================================================
 //  MAISON ANARA — Panneau d'administration
 // =====================================================================
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const { createClient } = window.supabase;   // librairie hébergée en local (vendor/supabase.js)
 
 const SUPABASE_URL = 'https://zhuukwcnzoueyoegmegi.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_9DYHswwUBkzXVEitvdKzBQ_fHHPJXuI';
@@ -40,10 +40,15 @@ $('#login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const err = $('#lg-err'); err.textContent = '';
   const btn = $('#lg-btn'); btn.disabled = true; btn.textContent = 'Connexion…';
-  const { error } = await supabase.auth.signInWithPassword({ email: $('#lg-email').value.trim(), password: $('#lg-pass').value });
-  btn.disabled = false; btn.textContent = 'Se connecter';
-  if (error) { err.textContent = 'Email ou mot de passe incorrect.'; return; }
-  montrerDashboard();
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email: $('#lg-email').value.trim(), password: $('#lg-pass').value });
+    if (error) { err.textContent = 'Email ou mot de passe incorrect.'; return; }
+    montrerDashboard();
+  } catch (ex) {
+    err.textContent = 'Connexion impossible (problème réseau). Réessayez.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Se connecter';
+  }
 });
 
 $('#btn-logout').addEventListener('click', async () => { await supabase.auth.signOut(); montrerLogin(); });
