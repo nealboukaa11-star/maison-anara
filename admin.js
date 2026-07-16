@@ -224,9 +224,19 @@ async function chargerCommandes() {
       <td><span class="pastille-etat" style="background:${STATUT_COULEUR[c.statut] || '#999'}"></span>
           <select class="statut" data-statut="${c.id}">${opts}</select></td>
       <td><span class="badge">${esc(c.source || 'site')}</span></td>
-      <td><button class="b ghost sm" data-notes="${c.id}">${c.notes ? '📝' : '+'} </button></td>
+      <td style="white-space:nowrap">
+        <button class="b ghost sm" data-notes="${c.id}" title="Notes">${c.notes ? '📝' : '+'}</button>
+        <button class="b danger sm" data-delc="${c.id}" title="Supprimer">×</button>
+      </td>
     </tr>`;
   }).join('');
+
+  body.querySelectorAll('[data-delc]').forEach(b => b.onclick = async () => {
+    const c = COMMANDES.find(x => x.id === b.dataset.delc);
+    if (!confirm(`Supprimer la commande de « ${c.client_nom} » ?`)) return;
+    await supabase.from('commandes').delete().eq('id', c.id);
+    chargerCommandes();
+  });
 
   body.querySelectorAll('[data-statut]').forEach(sel => sel.onchange = async () => {
     await supabase.from('commandes').update({ statut: sel.value }).eq('id', sel.dataset.statut);
