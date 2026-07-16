@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Administration — Maison Anara</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Jost:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body{background:var(--ivoire-2)}
+  /* ---- login ---- */
+  .admin-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .login-boite{background:#fff;border:1px solid var(--ligne);border-radius:6px;padding:40px 34px;max-width:400px;width:100%}
+  .login-boite .marque{display:block;text-align:center;margin-bottom:6px;font-size:20px}
+  .login-boite .sous{text-align:center;color:#8f8a82;font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px}
+  /* ---- shell ---- */
+  .admin-top{background:#fff;border-bottom:1px solid var(--ligne);position:sticky;top:0;z-index:40}
+  .admin-top-in{max-width:1180px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+  .admin-top .marque{font-size:18px}
+  .admin-onglets{background:#fff;border-bottom:1px solid var(--ligne)}
+  .admin-onglets-in{max-width:1180px;margin:0 auto;padding:0 24px;display:flex;gap:8px}
+  .onglet{background:none;border:none;padding:16px 18px;font-family:var(--sans);font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:#8f8a82;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .onglet.actif{color:var(--encre);border-bottom-color:var(--or)}
+  .admin-corps{max-width:1180px;margin:0 auto;padding:32px 24px 80px}
+  /* ---- boutons ---- */
+  .b{display:inline-flex;align-items:center;gap:8px;background:var(--nuit);color:#fff;border:none;padding:12px 20px;font-family:var(--sans);font-size:13px;letter-spacing:.08em;text-transform:uppercase;border-radius:3px;cursor:pointer;transition:.2s}
+  .b:hover{background:var(--or)}
+  .b.ghost{background:none;color:var(--encre);border:1px solid var(--ligne)}
+  .b.ghost:hover{background:none;border-color:var(--encre)}
+  .b.danger{background:none;color:var(--rouge);border:1px solid #e6c9ca}
+  .b.danger:hover{background:var(--rouge);color:#fff}
+  .b.sm{padding:8px 12px;font-size:12px}
+  /* ---- entête section ---- */
+  .sec-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:16px;flex-wrap:wrap}
+  .sec-bar h2{font-size:26px}
+  /* ---- cartes KPI ---- */
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:26px}
+  .kpi{background:#fff;border:1px solid var(--ligne);border-radius:5px;padding:20px}
+  .kpi .lab{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#8f8a82;margin-bottom:8px}
+  .kpi .val{font-family:var(--serif);font-size:30px}
+  .kpi .val small{font-size:14px;color:#8f8a82}
+  /* ---- tableaux ---- */
+  .tbl-wrap{background:#fff;border:1px solid var(--ligne);border-radius:5px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-weight:500;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#8f8a82;padding:14px 14px;border-bottom:1px solid var(--ligne);white-space:nowrap;background:#fafafa}
+  td{padding:13px 14px;border-bottom:1px solid var(--ligne);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  .mini-img{width:46px;height:46px;object-fit:contain;background:#fff;border:1px solid var(--ligne);border-radius:4px}
+  .pastille-etat{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:middle}
+  select.statut,select.mini,input.mini{font-family:var(--sans);font-size:13px;padding:7px 9px;border:1px solid var(--ligne);border-radius:4px;background:#fff}
+  .badge{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:99px;background:#f0efec;color:#6f6a63}
+  .vide{padding:40px;text-align:center;color:#8f8a82}
+  /* ---- modale admin ---- */
+  .amodal{position:fixed;inset:0;background:rgba(26,24,21,.55);display:none;align-items:flex-start;justify-content:center;padding:30px 16px;z-index:200;overflow:auto}
+  .amodal.ouvert{display:flex}
+  .amodal-boite{background:#fff;border-radius:6px;max-width:640px;width:100%;padding:30px;position:relative;margin:auto}
+  .amodal-boite h3{font-family:var(--serif);font-weight:500;font-size:24px;margin-bottom:20px}
+  .champ{margin-bottom:15px}
+  .champ label{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#8f8a82;margin-bottom:6px}
+  .champ input,.champ select,.champ textarea{width:100%;padding:11px 13px;border:1px solid var(--ligne);border-radius:4px;font-family:var(--sans);font-size:15px;background:#fff;color:var(--encre)}
+  .champ textarea{resize:vertical;min-height:80px}
+  .champ input:focus,.champ select:focus,.champ textarea:focus{outline:none;border-color:var(--or)}
+  .rang2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .form-err{color:var(--rouge);font-size:14px;margin-top:8px}
+  .teinte-ligne{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .teinte-ligne input[type=text]{flex:1}
+  .teinte-ligne input[type=color]{width:44px;height:38px;padding:2px;border:1px solid var(--ligne);border-radius:4px;background:#fff}
+  .photos-apercu{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+  .photo-vig{position:relative;width:76px;height:76px;border:1px solid var(--ligne);border-radius:5px;overflow:hidden;background:#fff}
+  .photo-vig img{width:100%;height:100%;object-fit:contain}
+  .photo-vig button{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:13px;line-height:1}
+  .switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:14px}
+  .switch input{width:auto}
+  .chart{display:grid;gap:8px}
+  .chart-ligne{display:grid;grid-template-columns:120px 1fr 52px;align-items:center;gap:10px;font-size:13px}
+  .chart-lab{color:#57534d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chart-barre{background:#efece6;border-radius:99px;height:16px;overflow:hidden}
+  .chart-barre span{display:block;height:100%;background:var(--or);border-radius:99px}
+  .chart-val{text-align:right;color:#6f6a63}
+  .funnel{display:grid;gap:10px;max-width:520px}
+  .funnel-etape{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--ligne);border-radius:5px;padding:14px 18px}
+  .funnel-etape b{font-family:var(--serif);font-size:22px}
+  .funnel-etape .tx{font-size:12px;color:#8f8a82}
+  .grille-admin{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:800px){
+    .kpis{grid-template-columns:1fr}
+    .rang2,.grille-admin{grid-template-columns:1fr}
+    .chart-ligne{grid-template-columns:90px 1fr 44px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div class="admin-login" id="login-vue">
+  <form class="login-boite" id="login-form">
+    <span class="marque">Maison <em style="font-style:normal;color:var(--or)">Anara</em></span>
+    <div class="sous">Administration</div>
+    <div class="champ"><label for="lg-email">Email</label><input id="lg-email" type="email" autocomplete="username" required></div>
+    <div class="champ"><label for="lg-pass">Mot de passe</label><input id="lg-pass" type="password" autocomplete="current-password" required></div>
+    <button class="b" type="submit" id="lg-btn" style="width:100%;justify-content:center">Se connecter</button>
+    <div class="form-err" id="lg-err"></div>
+  </form>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="dash-vue" hidden>
+  <div class="admin-top">
+    <div class="admin-top-in">
+      <span class="marque" style="font-family:var(--serif);letter-spacing:.3em;text-transform:uppercase">Maison <em style="font-style:normal;color:var(--or)">Anara</em> · Admin</span>
+      <button class="b ghost sm" id="btn-logout">Déconnexion</button>
+    </div>
+  </div>
+  <div class="admin-onglets">
+    <div class="admin-onglets-in">
+      <button class="onglet actif" data-tab="produits">Produits</button>
+      <button class="onglet" data-tab="commandes">Commandes</button>
+      <button class="onglet" data-tab="analytics">Analytics</button>
+    </div>
+  </div>
+
+  <div class="admin-corps">
+    <!-- PRODUITS -->
+    <section id="tab-produits">
+      <div class="sec-bar">
+        <h2>Produits</h2>
+        <button class="b" id="btn-add-produit">+ Ajouter un produit</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th></th><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Visible</th><th></th></tr></thead>
+          <tbody id="produits-body"><tr><td colspan="6" class="vide">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- COMMANDES -->
+    <section id="tab-commandes" hidden>
+      <div class="sec-bar">
+        <h2>Commandes</h2>
+        <button class="b" id="btn-add-commande">+ Commande manuelle</button>
+      </div>
+      <div class="kpis" id="cmd-kpis"></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Client</th><th>Produit</th><th>Qté</th><th>Total</th><th>Acompte</th><th>Statut</th><th>Source</th><th>Notes</th></tr></thead>
+          <tbody id="commandes-body"><tr><td colspan="9" class="vide">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section id="tab-analytics" hidden>
+      <div class="sec-bar"><h2>Analytics</h2><button class="b ghost sm" id="btn-refresh-analytics">Rafraîchir</button></div>
+      <div class="kpis" id="ana-kpis"></div>
+      <div style="margin:8px 0 26px">
+        <h3 style="font-family:var(--serif);font-weight:500;font-size:18px;margin-bottom:14px">Visites (14 derniers jours)</h3>
+        <div class="chart" id="chart-visites"></div>
+      </div>
+      <div class="grille-admin">
+        <div>
+          <h3 style="font-family:var(--serif);font-weight:500;font-size:18px;margin-bottom:14px">Produits les plus consultés</h3>
+          <div class="chart" id="chart-produits"></div>
+        </div>
+        <div>
+          <h3 style="font-family:var(--serif);font-weight:500;font-size:18px;margin-bottom:14px">Pages les plus vues</h3>
+          <div class="chart" id="chart-pages"></div>
+        </div>
+      </div>
+      <h3 style="font-family:var(--serif);font-weight:500;font-size:18px;margin:30px 0 14px">Funnel de conversion</h3>
+      <div class="funnel" id="funnel"></div>
+    </section>
+  </div>
+</div>
+
+<!-- ============ MODALE PRODUIT ============ -->
+<div class="amodal" id="modal-produit">
+  <div class="amodal-boite">
+    <h3 id="mp-titre">Produit</h3>
+    <div class="rang2">
+      <div class="champ"><label>Nom</label><input id="mp-nom"></div>
+      <div class="champ"><label>Slug (adresse)</label><input id="mp-slug" placeholder="ex: selma"></div>
+    </div>
+    <div class="rang2">
+      <div class="champ"><label>Catégorie</label><input id="mp-categorie" placeholder="Lampe de table, Suspension…"></div>
+      <div class="champ"><label>Ordre d'affichage</label><input id="mp-ordre" type="number" value="0"></div>
+    </div>
+    <div class="champ"><label>Description</label><textarea id="mp-description"></textarea></div>
+    <div class="rang2">
+      <div class="champ"><label>Prix (MAD)</label><input id="mp-prix" type="number" step="0.01"></div>
+      <div class="champ"><label>Prix promo (optionnel)</label><input id="mp-promo" type="number" step="0.01" placeholder="—"></div>
+    </div>
+    <div class="rang2">
+      <div class="champ"><label>Dimensions</label><input id="mp-dimensions" placeholder="H 46 cm × Ø 19 cm"></div>
+      <div class="champ"><label>Délai de fabrication</label><input id="mp-delai" placeholder="5 à 7 jours ouvrés"></div>
+    </div>
+    <div class="champ">
+      <label>Teintes / variantes</label>
+      <div id="mp-teintes"></div>
+      <button class="b ghost sm" id="mp-add-teinte" type="button" style="margin-top:6px">+ Ajouter une teinte</button>
+    </div>
+    <div class="champ">
+      <label>Photos</label>
+      <div class="photos-apercu" id="mp-photos"></div>
+      <input type="file" id="mp-file" accept="image/*" multiple>
+      <div style="font-size:12.5px;color:#8f8a82;margin-top:6px">La 1ʳᵉ photo est celle affichée sur la collection.</div>
+    </div>
+    <label class="switch" style="margin:6px 0 18px"><input type="checkbox" id="mp-visible" checked> Visible sur le site</label>
+    <div class="form-err" id="mp-err"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="b ghost" id="mp-annuler" type="button">Annuler</button>
+      <button class="b" id="mp-save" type="button">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODALE COMMANDE MANUELLE ============ -->
+<div class="amodal" id="modal-commande">
+  <div class="amodal-boite">
+    <h3>Commande manuelle</h3>
+    <div class="rang2">
+      <div class="champ"><label>Nom du client</label><input id="mc-nom"></div>
+      <div class="champ"><label>Téléphone</label><input id="mc-tel"></div>
+    </div>
+    <div class="rang2">
+      <div class="champ"><label>Ville</label><input id="mc-ville"></div>
+      <div class="champ"><label>Source</label>
+        <select id="mc-source"><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="manuel">Autre / direct</option></select>
+      </div>
+    </div>
+    <div class="champ"><label>Produit</label><select id="mc-produit"></select></div>
+    <div class="rang2">
+      <div class="champ"><label>Teinte</label><input id="mc-teinte" placeholder="optionnel"></div>
+      <div class="champ"><label>Quantité</label><input id="mc-qte" type="number" min="1" value="1"></div>
+    </div>
+    <div class="rang2">
+      <div class="champ"><label>Total (MAD)</label><input id="mc-total" type="number" step="0.01"></div>
+      <div class="champ"><label>Statut</label><select id="mc-statut"></select></div>
+    </div>
+    <label class="switch" style="margin:6px 0"><input type="checkbox" id="mc-acompte"> Acompte reçu</label>
+    <div class="champ" style="margin-top:12px"><label>Notes</label><textarea id="mc-notes"></textarea></div>
+    <div class="form-err" id="mc-err"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="b ghost" id="mc-annuler" type="button">Annuler</button>
+      <button class="b" id="mc-save" type="button">Créer la commande</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="admin.js"></script>
+</body>
+</html>
