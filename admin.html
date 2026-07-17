@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="style.css">
 <style>
   body{background:var(--ivoire-2)}
+  /* [hidden] doit toujours l'emporter (sinon display:flex ci-dessous le réaffiche) */
+  [hidden]{display:none!important}
   /* ---- login ---- */
   .admin-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
   .login-boite{background:#fff;border:1px solid var(--ligne);border-radius:6px;padding:40px 34px;max-width:400px;width:100%}
