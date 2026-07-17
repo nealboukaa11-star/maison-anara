@@ -96,7 +96,7 @@ function ficheHtml(p) {
     <div class="bloc">
       <div class="bloc-titre">Teinte${teintes.length > 1 ? ' de la base' : ''}</div>
       <div class="teintes" role="radiogroup" aria-label="Choisir la teinte">
-        ${teintes.map((t, i) => `<button class="teinte${i === 0 ? ' actif' : ''}" style="background:${esc(t.hex || '#ccc')}" data-nom="${esc(t.nom)}" role="radio" aria-checked="${i === 0 ? 'true' : 'false'}" aria-label="${esc(t.nom)}"></button>`).join('')}
+        ${teintes.map((t, i) => `<button class="teinte${i === 0 ? ' actif' : ''}" style="background:${esc(t.hex || '#ccc')}" data-nom="${esc(t.nom)}" data-photo="${esc(t.photo || '')}" role="radio" aria-checked="${i === 0 ? 'true' : 'false'}" aria-label="${esc(t.nom)}"></button>`).join('')}
       </div>
       <div class="teinte-nom">Teinte choisie : <b id="teinte-choisie">${esc(teintes[0].nom)}</b></div>
     </div>` : '';
@@ -107,7 +107,10 @@ function ficheHtml(p) {
   if (p.delai) specs.push(`<li><span>Délai</span><span>${esc(p.delai)}</span></li>`);
   specs.push(`<li><span>Douille</span><span>E27 — ampoule non incluse</span></li>`);
 
-  const img = (Array.isArray(p.photos) && p.photos[0]) ? p.photos[0] : '';
+  // image principale : photo de la 1ʳᵉ teinte si elle en a une, sinon photo par défaut
+  const img = (teintes[0] && teintes[0].photo) ? teintes[0].photo
+            : ((Array.isArray(p.photos) && p.photos[0]) ? p.photos[0]
+            : (teintes.find(t => t.photo)?.photo || ''));
   const vignettes = (Array.isArray(p.photos) && p.photos.length > 1)
     ? `<div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap">${p.photos.map((u, i) => `<button class="vignette" data-src="${esc(u)}" style="width:72px;height:72px;border:1px solid var(--ligne);border-radius:3px;padding:6px;background:#fff;cursor:pointer${i === 0 ? ';outline:2px solid var(--or);outline-offset:2px' : ''}"><img src="${esc(u)}" alt="" style="width:100%;height:100%;object-fit:contain"></button>`).join('')}</div>`
     : '';
@@ -137,6 +140,7 @@ function ficheHtml(p) {
 function activerFiche(p) {
   let teinte = (Array.isArray(p.teintes) && p.teintes[0]) ? p.teintes[0].nom : '';
 
+  const photoDefaut = (Array.isArray(p.photos) && p.photos[0]) ? p.photos[0] : '';
   document.querySelectorAll('.teinte').forEach(b => {
     b.addEventListener('click', () => {
       document.querySelectorAll('.teinte').forEach(x => { x.classList.remove('actif'); x.setAttribute('aria-checked', 'false'); });
@@ -145,6 +149,10 @@ function activerFiche(p) {
       teinte = b.dataset.nom;
       const nom = document.getElementById('teinte-choisie');
       if (nom) nom.textContent = teinte;
+      // change l'image principale selon la teinte (photo dédiée, sinon photo par défaut)
+      const visu = document.querySelector('#visu img');
+      const ph = b.dataset.photo;
+      if (visu && (ph || photoDefaut)) visu.src = ph || photoDefaut;
     });
   });
 

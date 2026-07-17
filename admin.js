@@ -117,17 +117,42 @@ let editId = null;
 let teintesEdit = [];
 let photosEdit = [];
 
+async function televerser(file) {
+  const chemin = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}-${file.name.replace(/[^a-zA-Z0-9.\-]/g, '_')}`;
+  const { error } = await supabase.storage.from('produits').upload(chemin, file, { cacheControl: '3600', upsert: false });
+  if (error) return { error: error.message };
+  const { data } = supabase.storage.from('produits').getPublicUrl(chemin);
+  return { url: data.publicUrl };
+}
+
 function rendreTeintes() {
   $('#mp-teintes').innerHTML = teintesEdit.map((t, i) => `
     <div class="teinte-ligne">
-      <input type="color" value="${esc(t.hex || '#cccccc')}" data-ti="${i}" data-tf="hex">
+      <input type="color" value="${esc(t.hex || '#cccccc')}" data-ti="${i}" data-tf="hex" title="Couleur">
       <input type="text" placeholder="Nom (ex: Rouge cerise)" value="${esc(t.nom || '')}" data-ti="${i}" data-tf="nom">
+      <div class="teinte-photo">
+        ${t.photo ? `<img src="${esc(t.photo)}" alt=""><button class="tp-x" data-tphotodel="${i}" type="button" title="Retirer">×</button>` : '<span class="tp-vide">—</span>'}
+      </div>
+      <button class="b ghost sm" data-tupload="${i}" type="button">${t.photo ? 'Changer' : 'Photo'}</button>
       <button class="b danger sm" data-tdel="${i}" type="button">×</button>
+      <input type="file" accept="image/*" data-tfile="${i}" hidden>
     </div>`).join('');
-  $('#mp-teintes').querySelectorAll('input').forEach(inp => inp.oninput = () => {
+  $('#mp-teintes').querySelectorAll('input[type=color],input[type=text]').forEach(inp => inp.oninput = () => {
     teintesEdit[+inp.dataset.ti][inp.dataset.tf] = inp.value;
   });
   $('#mp-teintes').querySelectorAll('[data-tdel]').forEach(b => b.onclick = () => { teintesEdit.splice(+b.dataset.tdel, 1); rendreTeintes(); });
+  $('#mp-teintes').querySelectorAll('[data-tphotodel]').forEach(b => b.onclick = () => { teintesEdit[+b.dataset.tphotodel].photo = null; rendreTeintes(); });
+  $('#mp-teintes').querySelectorAll('[data-tupload]').forEach(b => b.onclick = () => {
+    $('#mp-teintes').querySelector(`[data-tfile="${b.dataset.tupload}"]`).click();
+  });
+  $('#mp-teintes').querySelectorAll('[data-tfile]').forEach(inp => inp.onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const i = +inp.dataset.tfile;
+    $('#mp-err').textContent = 'Téléversement de la photo de teinte…';
+    const r = await televerser(f);
+    $('#mp-err').textContent = r.error ? ('Erreur upload : ' + r.error) : '';
+    if (r.url) { teintesEdit[i].photo = r.url; rendreTeintes(); }
+  });
 }
 
 function rendrePhotos() {
@@ -167,11 +192,9 @@ $('#mp-file').addEventListener('change', async (e) => {
   if (!files.length) return;
   $('#mp-err').textContent = 'Téléversement des photos…';
   for (const f of files) {
-    const chemin = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}-${f.name.replace(/[^a-zA-Z0-9.\-]/g, '_')}`;
-    const { error } = await supabase.storage.from('produits').upload(chemin, f, { cacheControl: '3600', upsert: false });
-    if (error) { $('#mp-err').textContent = 'Erreur upload : ' + error.message; continue; }
-    const { data } = supabase.storage.from('produits').getPublicUrl(chemin);
-    photosEdit.push(data.publicUrl);
+    const r = await televerser(f);
+    if (r.error) { $('#mp-err').textContent = 'Erreur upload : ' + r.error; continue; }
+    photosEdit.push(r.url);
   }
   $('#mp-err').textContent = '';
   $('#mp-file').value = '';

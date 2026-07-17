@@ -68,9 +68,14 @@
   .rang2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .form-err{color:var(--rouge);font-size:14px;margin-top:8px}
   #lg-err:not(:empty){background:#fdeaea;border:1px solid #f0c4c4;border-radius:4px;padding:12px 14px;margin-top:14px;font-size:14.5px;line-height:1.4}
-  .teinte-ligne{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-  .teinte-ligne input[type=text]{flex:1}
+  .teinte-ligne{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+  .teinte-ligne input[type=text]{flex:1;min-width:120px}
   .teinte-ligne input[type=color]{width:44px;height:38px;padding:2px;border:1px solid var(--ligne);border-radius:4px;background:#fff}
+  .teinte-photo{width:44px;height:44px;border:1px solid var(--ligne);border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff;flex-shrink:0}
+  .teinte-photo img{width:100%;height:100%;object-fit:contain}
+  .teinte-photo .tp-vide{color:#c9c4bb;font-size:14px}
+  .teinte-photo .tp-x{position:absolute;top:-7px;right:-7px;background:rgba(26,24,21,.72);color:#fff;border:none;border-radius:50%;width:18px;height:18px;cursor:pointer;font-size:11px;line-height:1}
+  .hint{font-size:12.5px;color:#8f8a82;margin:2px 0 8px}
   .photos-apercu{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
   .photo-vig{position:relative;width:76px;height:76px;border:1px solid var(--ligne);border-radius:5px;overflow:hidden;background:#fff}
   .photo-vig img{width:100%;height:100%;object-fit:contain}
@@ -202,6 +207,7 @@
     </div>
     <div class="champ">
       <label>Teintes / variantes</label>
+      <div class="hint">Couleur + nom, et une photo de la lampe dans cette teinte (optionnel) : l'image changera sur le site quand le client choisit la couleur.</div>
       <div id="mp-teintes"></div>
       <button class="b ghost sm" id="mp-add-teinte" type="button" style="margin-top:6px">+ Ajouter une teinte</button>
     </div>
