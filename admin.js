@@ -42,7 +42,13 @@ $('#login-form').addEventListener('submit', async (e) => {
   const btn = $('#lg-btn'); btn.disabled = true; btn.textContent = 'Connexion…';
   try {
     const { error } = await supabase.auth.signInWithPassword({ email: $('#lg-email').value.trim(), password: $('#lg-pass').value });
-    if (error) { err.textContent = 'Email ou mot de passe incorrect.'; return; }
+    if (error) {
+      const code = error.code || error.error_code || '';
+      if (code === 'email_not_confirmed') err.textContent = "Compte non confirmé : confirmez-le dans Supabase (Authentication → Users).";
+      else if (code === 'invalid_credentials') err.textContent = "Email ou mot de passe incorrect.";
+      else err.textContent = `${error.message} (${code || error.status || 'erreur'})`;
+      return;
+    }
     montrerDashboard();
   } catch (ex) {
     err.textContent = 'Connexion impossible (problème réseau). Réessayez.';
