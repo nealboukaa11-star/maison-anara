@@ -65,6 +65,7 @@
   .champ input:focus,.champ select:focus,.champ textarea:focus{outline:none;border-color:var(--or)}
   .rang2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .form-err{color:var(--rouge);font-size:14px;margin-top:8px}
+  #lg-err:not(:empty){background:#fdeaea;border:1px solid #f0c4c4;border-radius:4px;padding:12px 14px;margin-top:14px;font-size:14.5px;line-height:1.4}
   .teinte-ligne{display:flex;gap:8px;align-items:center;margin-bottom:8px}
   .teinte-ligne input[type=text]{flex:1}
   .teinte-ligne input[type=color]{width:44px;height:38px;padding:2px;border:1px solid var(--ligne);border-radius:4px;background:#fff}
@@ -99,7 +100,7 @@
   <form class="login-boite" id="login-form">
     <span class="marque">Maison <em style="font-style:normal;color:var(--or)">Anara</em></span>
     <div class="sous">Administration</div>
-    <div class="champ"><label for="lg-email">Email</label><input id="lg-email" type="email" autocomplete="username" required></div>
+    <div class="champ"><label for="lg-email">Email</label><input id="lg-email" type="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required></div>
     <div class="champ"><label for="lg-pass">Mot de passe</label><input id="lg-pass" type="password" autocomplete="current-password" required></div>
     <button class="b" type="submit" id="lg-btn" style="width:100%;justify-content:center">Se connecter</button>
     <div class="form-err" id="lg-err"></div>
