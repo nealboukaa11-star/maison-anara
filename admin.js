@@ -67,6 +67,10 @@ document.querySelectorAll('.onglet').forEach(o => o.addEventListener('click', ()
   $('#tab-produits').hidden = t !== 'produits';
   $('#tab-commandes').hidden = t !== 'commandes';
   $('#tab-analytics').hidden = t !== 'analytics';
+  // recharge les données fraîches à chaque ouverture d'onglet
+  if (t === 'produits') chargerProduits();
+  else if (t === 'commandes') chargerCommandes();
+  else if (t === 'analytics') chargerAnalytics();
 }));
 
 // =====================================================================
@@ -310,6 +314,7 @@ function ouvrirCommande() {
   $('#mc-statut').innerHTML = STATUTS.map(s => `<option value="${s}">${s}</option>`).join('');
   $('#modal-commande').classList.add('ouvert');
 }
+$('#btn-refresh-cmd').onclick = () => chargerCommandes();
 $('#btn-add-commande').onclick = ouvrirCommande;
 $('#mc-annuler').onclick = () => $('#modal-commande').classList.remove('ouvert');
 $('#mc-produit').onchange = () => {
